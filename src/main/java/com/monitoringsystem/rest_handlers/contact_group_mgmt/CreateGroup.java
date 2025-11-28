@@ -8,7 +8,7 @@ import com.monitoringsystem.db_handlers.DatabaseConnectionsHikari;
 import com.monitoringsystem.db_handlers.DatabaseOperationsHikari;
 import com.monitoringsystem.db_handlers.DatabaseResultsProcessors;
 import com.monitoringsystem.utils.EndpointProps;
-import com.monitoringsystem.utils.hashing.Hasher;
+import com.monitoringsystem.utils.TokenGenerator;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -28,34 +28,45 @@ public class CreateGroup implements HttpHandler
         if (formDataParser == null)
         {
             httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("Error !!!");
+            httpServerExchange.getResponseSender().send("{\"err_status\": \"Contact group creation failed\"}");
             return;
         }
 
         FormData formData = formDataParser.parseBlocking();
         String groupName = formData.getFirst("group_name").getValue();
         String description = formData.getFirst("description").getValue();
-        String contactGroupId = Hasher.hashSHA512(groupName);
-        Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
-        String sqlQuery = """
-            INSERT INTO contact_group (contact_group_id, group_name, description) 
-            VALUES (?, ?, ?)
-            """;
-        
-        List<Object> sqlParams = List.of(contactGroupId, groupName, description);
-        ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
-        String response = "";
-        if (resultSet != null)
+
+        if (!"".equals(groupName) && !"".equals(description))
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            String contactGroupId = TokenGenerator.generateSecureToken();
+            Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
+            String sqlQuery = """
+                INSERT INTO contact_groups (contact_group_id, group_name, description) 
+                VALUES (?, ?, ?)
+                """;
+            
+            List<Object> sqlParams = List.of(contactGroupId, groupName, description);
+            ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
+            String response = "";
+            if (resultSet != null)
+            {
+                response = "{\"err_status\": \"Contact group creation failed\"}";
+                DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
+            }
+            else
+            {
+                response = "{\"status\": \"Contact group creation successful\"}";
+            }
+
+            httpServerExchange.setStatusCode(200);
+            httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            httpServerExchange.getResponseSender().send(response);
         }
         else
         {
-            response = "{'status': 'success'}";
+            httpServerExchange.setStatusCode(200);
+            httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+            httpServerExchange.getResponseSender().send("{\"err_status\": \"Contact group creation failed\"}");
         }
-
-        httpServerExchange.setStatusCode(200);
-        httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-        httpServerExchange.getResponseSender().send(response);
     }
 }

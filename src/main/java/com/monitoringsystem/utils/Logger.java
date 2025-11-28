@@ -40,7 +40,6 @@ public class Logger
 
     public static void svcCheckLogger(List<Object> sqlParams)
     {
-        System.out.println("\nlogging health check");
         String sqlQuery = """
                 INSERT INTO service_health_check_logs (service_id, svc_status_id, response_time_ms, http_response_code, check_at, error_message) 
                 VALUES (?, 

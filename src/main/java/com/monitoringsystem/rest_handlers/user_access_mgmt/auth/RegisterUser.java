@@ -2,6 +2,7 @@ package com.monitoringsystem.rest_handlers.user_access_mgmt.auth;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.monitoringsystem.db_handlers.DatabaseConnectionsHikari;
@@ -17,7 +18,7 @@ import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/uam", templatePath = "/auth/register/{registrationToken}", httpMethod = "POST")
+@EndpointProps(prefixPath = "/uam", templatePath = "/auth/register/{registrationToken}", httpMethod = "POST", allowedRoles = {"GUEST"})
 public class RegisterUser implements HttpHandler
 {
     @Override
@@ -30,7 +31,7 @@ public class RegisterUser implements HttpHandler
         if (formDataParser == null)
         {
             httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("{'status': 'error'}");
+            httpServerExchange.getResponseSender().send("{\"err_status\": \"Registration failed\"}");
             return;
         }
         FormData formData = formDataParser.parseBlocking();
@@ -38,44 +39,63 @@ public class RegisterUser implements HttpHandler
         String password = formData.getFirst("password").getValue();
         String passwordConfirm = formData.getFirst("password_confirm").getValue();
         String status = "ACTIVE";
-        if (!ValidateRegToken.isValid(emailAddress, registrationToken))
+        if (!"".equals(emailAddress) && !"".equals(password) && !"".equals(passwordConfirm))
         {
-            httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("{'status': 'error'}");
-            return;
-        }
-
-        if (password.equals( passwordConfirm))
-        {
-            String hashedPassword = Hasher.hashSHA512(password);
-            Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
-            String sqlQuery = """
-            UPDATE system_users
-            SET password = ?,
-                status = ?
-            WHERE email_address = ?
-                """;
-            List<Object> sqlParams = List.of(emailAddress, hashedPassword, status);
-            ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
-            String response = "";
-            if (resultSet != null)
+            if (!ValidateRegToken.isValid(emailAddress, registrationToken))
             {
-                response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+                httpServerExchange.setStatusCode(400);
+                httpServerExchange.getResponseSender().send("{'status': 'error'}");
+                return;
+            }
+
+            if (password.equals(passwordConfirm))
+            {
+                String hashedPassword = Hasher.hashSHA512(password);
+                Connection connection;
+                try
+                {
+                    connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
+                    String sqlQuery = """
+                    UPDATE system_users
+                    SET password = ?,
+                        status = ?
+                    WHERE email_address = ?
+                        """;
+                    List<Object> sqlParams = List.of(hashedPassword, status, emailAddress);
+                    ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
+                    String response = "";
+                    if (resultSet != null && resultSet.next())
+                    {
+                        resultSet.beforeFirst();
+                        response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
+                    }
+                    else
+                    {
+                        response = "{\"status\": \"Registration successful\"}";
+                        AuthManager.destroyToken(emailAddress, "REG_TOKEN");
+                    }
+
+                    httpServerExchange.setStatusCode(200);
+                    httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                    httpServerExchange.getResponseSender().send(response);
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
             }
             else
             {
-                response = "{'status': 'success'}";
+                httpServerExchange.setStatusCode(200);
+                httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                httpServerExchange.getResponseSender().send("{\"err_status\": \"Registration Failed\"}");
             }
-
-            httpServerExchange.setStatusCode(200);
-            httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            httpServerExchange.getResponseSender().send(response);
         }
         else
         {
             httpServerExchange.setStatusCode(200);
             httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            httpServerExchange.getResponseSender().send("{'status': 'error'}");
+            httpServerExchange.getResponseSender().send("{\"err_status\" : \"Registration Failed\"}");
         }
 
 

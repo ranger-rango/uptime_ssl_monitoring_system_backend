@@ -22,7 +22,7 @@ public class GetService implements HttpHandler
         String serviceId = httpServerExchange.getQueryParameters().get("serviceId").getFirst();
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
-        SELECT si.service_id, si.service_name, si.service_url_domain, si.svc_registration_status, sc.svc_diag_id, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, scc.cert_diagnosis_interval, scc.alert_threshold_days
+        SELECT si.service_id, si.service_name, si.service_url_domain, si.svc_registration_status, sdm.diagnosis_method, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, sci.is_cert_active_status, scc.cert_diagnosis_interval, scc.alert_threshold_days
         FROM service_info si
         JOIN service_configs sc ON si.service_id = sc.service_id 
         JOIN service_diagnosis_methods sdm ON sc.svc_diag_id = sdm.svc_diag_id
@@ -35,7 +35,7 @@ public class GetService implements HttpHandler
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {

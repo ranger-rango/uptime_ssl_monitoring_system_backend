@@ -26,7 +26,6 @@ public class RunSvcHealthCheck implements HttpHandler
         objectMapper.registerModule(new JavaTimeModule());
 
         Map<String, Map<String, Object>> serviceConfigs = Constants.SERVICE_CONFIGURATION;
-        System.out.println(serviceConfigs);
         Map<String, Object> serviceConfig = serviceConfigs.entrySet().stream()
         .filter(entry -> String.valueOf(entry.getValue().get("service_id")).equals(serviceId))
         .map(Map.Entry::getValue)

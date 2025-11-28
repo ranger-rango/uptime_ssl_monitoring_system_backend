@@ -27,29 +27,32 @@ public class AddGroupMember implements HttpHandler
         if (formDataParser == null)
         {
             httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("Error !!!");
+            httpServerExchange.getResponseSender().send("{\"err_status\": \"Failed to add member\"}");
             return;
         }
 
         FormData formData = formDataParser.parseBlocking();
-        String contactGroupId = formData.getFirst("contact_group_id").getValue();
-        String userId = formData.getFirst("user_id").getValue();
+        String contactGroupName = formData.getFirst("contact_group").getValue();
+        String emailAddress = formData.getFirst("email_address").getValue();
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
             INSERT INTO contact_group_members (contact_group_id, user_id) 
-            VALUES (?, ?)
+            VALUES (
+            (SELECT contact_group_id FROM contact_groups WHERE group_name = ?), 
+            (SELECT user_id FROM system_users WHERE email_address = ?)
+            )
             """;
         
-        List<Object> sqlParams = List.of(contactGroupId, userId);
+        List<Object> sqlParams = List.of(contactGroupName, emailAddress);
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {
-            response = "{'status': 'success'}";
+            response = "{\"status\": \"Member added successfully\"}";
         }
 
         httpServerExchange.setStatusCode(200);

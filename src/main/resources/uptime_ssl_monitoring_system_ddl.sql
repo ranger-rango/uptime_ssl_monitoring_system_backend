@@ -121,10 +121,10 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE ssl_certificate_info (
     cert_id VARCHAR PRIMARY KEY NOT NULL,
-    -- CORRECTED: service_id changed from BIGINT to VARCHAR
     service_id VARCHAR NOT NULL UNIQUE REFERENCES service_info(service_id) ON DELETE CASCADE,
     issuer VARCHAR(255) NOT NULL,
     expiry_date DATE NOT NULL,
+    is_cert_active_status VARCHAR(10) NOT NULL, -- ACTIVE, TERMINAL
     date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     date_modified TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -160,7 +160,6 @@ CREATE TABLE public.user_registration_tokens
 -- =========================================================================
 
 CREATE TABLE service_configs (
-    -- CORRECTED: service_id changed from BIGINT to VARCHAR
     service_id VARCHAR PRIMARY KEY REFERENCES service_info(service_id) ON DELETE CASCADE,
     svc_diag_id BIGINT NOT NULL REFERENCES service_diagnosis_methods(svc_diag_id) ON DELETE RESTRICT,
     svc_diagnosis_interval INTEGER NOT NULL,
@@ -173,7 +172,6 @@ CREATE TRIGGER update_service_configs_date_modified BEFORE UPDATE ON service_con
 FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE ssl_certificate_configs (
-    -- CORRECTED: cert_id changed from BIGINT to VARCHAR
     cert_id VARCHAR PRIMARY KEY REFERENCES ssl_certificate_info(cert_id) ON DELETE CASCADE,
     svc_diag_id BIGINT NOT NULL REFERENCES service_diagnosis_methods(svc_diag_id) ON DELETE RESTRICT,
     cert_diagnosis_interval INTEGER NOT NULL,
@@ -189,9 +187,7 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 -- =========================================================================
 
 CREATE TABLE contact_group_members (
-    -- CORRECTED: contact_group_id changed from BIGINT to VARCHAR
     contact_group_id VARCHAR NOT NULL REFERENCES contact_groups(contact_group_id) ON DELETE CASCADE,
-    -- CORRECTED: user_id changed from BIGINT to VARCHAR
     user_id VARCHAR NOT NULL REFERENCES system_users(user_id) ON DELETE CASCADE,
     PRIMARY KEY (contact_group_id, user_id),
     date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -201,9 +197,7 @@ CREATE TRIGGER update_contact_group_members_date_modified BEFORE UPDATE ON conta
 FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE service_contact_groups (
-    -- CORRECTED: service_id changed from BIGINT to VARCHAR
     service_id VARCHAR NOT NULL REFERENCES service_info(service_id) ON DELETE CASCADE,
-    -- CORRECTED: contact_group_id changed from BIGINT to VARCHAR
     contact_group_id VARCHAR NOT NULL REFERENCES contact_groups(contact_group_id) ON DELETE CASCADE,
     PRIMARY KEY (service_id, contact_group_id),
     date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -218,7 +212,6 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE service_health_check_logs (
     shc_log_id BIGSERIAL PRIMARY KEY,
-    -- CORRECTED: service_id changed from BIGINT to VARCHAR
     service_id VARCHAR NOT NULL REFERENCES service_info(service_id) ON DELETE CASCADE,
     svc_status_id BIGINT NOT NULL REFERENCES service_status(svc_status_id) ON DELETE RESTRICT,
     response_time_ms INTEGER NOT NULL,
@@ -233,7 +226,6 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE ssl_cert_health_check_logs (
     schl_log_id BIGSERIAL PRIMARY KEY,
-    -- CORRECTED: cert_id changed from BIGINT to VARCHAR
     cert_id VARCHAR NOT NULL REFERENCES ssl_certificate_info(cert_id) ON DELETE CASCADE,
     cert_status_id BIGINT NOT NULL REFERENCES certificate_status(cert_status_id) ON DELETE RESTRICT,
     last_checked_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -245,9 +237,7 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 
 CREATE TABLE user_actions_audit_logs (
     uaa_log_id BIGSERIAL PRIMARY KEY,
-    -- CORRECTED: user_id changed from BIGINT to VARCHAR
     user_id VARCHAR NOT NULL REFERENCES system_users(user_id) ON DELETE RESTRICT,
-    -- CORRECTED: service_id changed from BIGINT to VARCHAR
     service_id VARCHAR REFERENCES service_info(service_id) ON DELETE SET NULL,
     action VARCHAR(20) NOT NULL, -- e.g., CREATE, UPDATE, DELETE
     action_timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -260,7 +250,6 @@ FOR EACH ROW EXECUTE PROCEDURE update_date_modified();
 CREATE TABLE notification_history_logs (
     nh_log_id BIGSERIAL PRIMARY KEY,
     notification_trigger_id BIGINT NOT NULL REFERENCES notification_triggers(notification_trigger_id) ON DELETE RESTRICT,
-    -- CORRECTED: user_id changed from BIGINT to VARCHAR
     user_id VARCHAR NOT NULL REFERENCES system_users(user_id) ON DELETE RESTRICT,
     channel_id BIGINT NOT NULL REFERENCES notification_channels(channel_id) ON DELETE RESTRICT,
     created_at TIMESTAMP NOT NULL,

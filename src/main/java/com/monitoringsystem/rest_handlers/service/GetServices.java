@@ -21,24 +21,24 @@ public class GetServices implements HttpHandler
     {
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
-        SELECT si.service_id, si.service_name, si.service_url_domain, si.svc_registration_status, sdm.diagnosis_method, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, scc.cert_diagnosis_interval, scc.alert_threshold_days
+        SELECT si.service_id, si.service_name, si.service_url_domain, si.svc_registration_status, sdm.diagnosis_method, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, sci.is_cert_active_status, scc.cert_diagnosis_interval, scc.alert_threshold_days
         FROM service_info si
         JOIN service_configs sc ON si.service_id = sc.service_id 
         JOIN service_diagnosis_methods sdm ON sc.svc_diag_id = sdm.svc_diag_id
         JOIN ssl_certificate_info sci ON sci.service_id = si.service_id
         JOIN ssl_certificate_configs scc ON sci.cert_id = scc.cert_id
-        --WHERE si.svc_registration_status = 'ACTIVE'
+        WHERE sci.is_cert_active_status = 'ACTIVE' --AND si.svc_registration_status = 'ACTIVE'
             """;
         List<Object> sqlParams = List.of();
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {
-            response = "{'status' : 'error'}";
+            response = "{\"err_status\" : \"Services fetch failed\"}";
         }
 
         httpServerExchange.setStatusCode(200);

@@ -32,24 +32,26 @@ public class AddGroupService implements HttpHandler
         }
 
         FormData formData = formDataParser.parseBlocking();
-        String contactGroupId = formData.getFirst("contact_group_id").getValue();
-        String serviceId = formData.getFirst("service_id").getValue();
+        String contactGroupName = formData.getFirst("contact_group").getValue();
+        String serviceName = formData.getFirst("service_name").getValue();
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
-            INSERT INTO contact_group (contact_group_id, service_id) 
-            VALUES (?, ?)
+            INSERT INTO service_contact_groups (service_id, contact_group_id) 
+            VALUES (
+            (SELECT contact_group_id FROM contact_groups WHERE group_name = ?), 
+            (SELECT service_id FROM service_info WHERE service_name = ?))
             """;
         
-        List<Object> sqlParams = List.of(contactGroupId, serviceId);
+        List<Object> sqlParams = List.of(contactGroupName, serviceName);
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {
-            response = "{'status': 'success'}";
+            response = "{\"status\": \"Service added successfully\"}";
         }
 
         httpServerExchange.setStatusCode(200);

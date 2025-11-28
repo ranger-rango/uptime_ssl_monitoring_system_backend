@@ -31,7 +31,7 @@ public class GetUsers implements HttpHandler
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {

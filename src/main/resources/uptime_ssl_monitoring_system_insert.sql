@@ -11,20 +11,10 @@
 
 -- Roles (3 records)
 INSERT INTO roles (role_title) VALUES ('ADMIN'), ('OPERATOR'), ('VIEWER');
-
--- Notification Channels (3 records)
 INSERT INTO notification_channels (channel_title) VALUES ('EMAIL'), ('TELEGRAM'), ('SMS');
-
--- Service Diagnosis Methods (4 records)
-INSERT INTO service_diagnosis_methods (diagnosis_method) VALUES ('PING'), ('REQUEST'), ('PORT_SCAN'), ('TLS_HANDSHAKE');
-
--- Certificate Status (4 records)
+INSERT INTO service_diagnosis_methods (diagnosis_method) VALUES ('PING'), ('REQUEST'), ('PORT_SCAN'), ('HEAD'), ('OPTIONS'),('TLS_HANDSHAKE');
 INSERT INTO certificate_status (cert_health_status) VALUES ('VALID'), ('WATCH'), ('EXPIRED'), ('TERMINAL');
-
--- Service Status (2 records)
 INSERT INTO service_status (svc_health_status) VALUES ('UP'), ('DOWN');
-
--- Notification Triggers (3 records)
 INSERT INTO notification_triggers (notification_trigger) VALUES ('SVC_DOWN'), ('SSL_CERT_EXPIRY'), ('CONFIG_CHANGE');
 
 

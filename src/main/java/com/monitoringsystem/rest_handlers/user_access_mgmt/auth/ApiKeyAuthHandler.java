@@ -20,7 +20,15 @@ public class ApiKeyAuthHandler implements HttpHandler
         if (authToken == null || authToken.isBlank())
         {
             httpServerExchange.setStatusCode(401);
-            httpServerExchange.getResponseSender().send("{'error' : 'Missing Auth Token'}");
+            httpServerExchange.getResponseSender().send("{\"err_status\" : \"Missing Auth Token\"}");
+            return;
+        }
+
+        if ("GUEST".equals(authToken))
+        {
+            UserSession userSession = new UserSession("GUEST", "GUEST", "GUEST");
+            httpServerExchange.putAttachment(Attachments.USER_SESSION, userSession);
+            next.handleRequest(httpServerExchange);
             return;
         }
 
@@ -29,7 +37,7 @@ public class ApiKeyAuthHandler implements HttpHandler
         if (userAttr == null)
         {
             httpServerExchange.setStatusCode(401);
-            httpServerExchange.getResponseSender().send("{'error' : 'Invalid Auth Token'}");
+            httpServerExchange.getResponseSender().send("{\"err_status\" : \"Invalid Auth Token\"}");
             return;
         }
 

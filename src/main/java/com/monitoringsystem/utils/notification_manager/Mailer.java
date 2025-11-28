@@ -25,6 +25,16 @@ public class Mailer
     private static String username = Constants.SMTP_SERVER_USERNAME;
     private static String password = Constants.SMTP_SERVER_PASSWORD;
     private static Properties props = new Properties();
+
+    static
+    {
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", port);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+    }
     public static String getHtmlContent(String templateName)
     {
         String htmlTemplate = null;
@@ -41,10 +51,7 @@ public class Mailer
 
     public static void sendEmailNotification(String templateName, String recipientEmail, String recipientName, String serviceUrl, String notificationTrigger)
     {
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication()
             {
@@ -74,10 +81,6 @@ public class Mailer
 
     public static void sendResgistrationUrl(String templateName, String recipientEmail, String recipientName, String registrationUrl)
     {
-        props.put("mail.smtp.host", host);
-        props.put("mail.smtp.port", port);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication()
             {

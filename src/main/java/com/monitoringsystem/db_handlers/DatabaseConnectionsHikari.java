@@ -11,13 +11,8 @@ public class DatabaseConnectionsHikari
 {
     private static HikariDataSource dataSource;
 
-    public static HikariDataSource getDbDataSource()
+    static
     {
-        if (dataSource != null && !dataSource.isClosed())
-        {
-            dataSource.close();
-        }
-
         Properties properties = new Properties();
         try (FileInputStream input = new FileInputStream("sys.conf/db.properties"))
         {
@@ -30,8 +25,11 @@ public class DatabaseConnectionsHikari
 
         HikariConfig hikariConfig = new HikariConfig(properties);
         dataSource = new HikariDataSource(hikariConfig);
+    }
+
+    public static HikariDataSource getDbDataSource()
+    {
         return dataSource;
-        
     }
 
     public static void closeDbDataSource()

@@ -13,6 +13,7 @@ import com.monitoringsystem.utils.EndpointProps;
 import io.undertow.Handlers;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.RoutingHandler;
+import io.undertow.server.handlers.BlockingHandler;
 
 public class Routes
 {
@@ -46,10 +47,10 @@ public class Routes
 
                         switch (endpointMethod)
                         {
-                            case "GET" -> handlers.get(fullPath, new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles)));
-                            case "POST" -> handlers.post(fullPath, new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles)));
-                            case "PUT" -> handlers.put(fullPath, new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles)));
-                            case "DELETE" -> handlers.delete(fullPath, new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles)));
+                            case "GET" -> handlers.get(fullPath, new BlockingHandler(new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles))));
+                            case "POST" -> handlers.post(fullPath, new BlockingHandler(new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles))));
+                            case "PUT" -> handlers.put(fullPath, new BlockingHandler(new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles))));
+                            case "DELETE" -> handlers.delete(fullPath, new BlockingHandler(new ApiKeyAuthHandler(new Rbac(handlerInstance, allowedRoles))));
                             default -> throw new IllegalArgumentException("Unsupported HTTP Method: " + endpointMethod);
                         }
                         System.out.println(fullPath);

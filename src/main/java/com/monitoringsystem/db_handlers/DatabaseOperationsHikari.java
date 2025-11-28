@@ -21,7 +21,7 @@ public class DatabaseOperationsHikari
         try
         {
             connection.setAutoCommit(false);
-            PreparedStatement pstmt = connection.prepareStatement(sql);
+            PreparedStatement pstmt = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             for (int i = 0; i < sqlParams.size(); i++)
             {
                 pstmt.setObject(i + 1, sqlParams.get(i));
@@ -41,6 +41,7 @@ public class DatabaseOperationsHikari
         catch (SQLException e)
         {
             connection.rollback();
+            System.out.println("ops\n");
             e.printStackTrace();
         }
 

@@ -24,6 +24,9 @@ import com.monitoringsystem.utils.notification_manager.Mailer;
 public class TaskScheduler
 {
     private static final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
+    private static String undertowHost = Constants.UNDERTOW_HOST;
+    private static String undertowPort = Constants.UDERTOW_PORT;
+    private static String undertowBaseUrl = Constants.UNDERTOW_BASE_PATH_REST;
 
     @SuppressWarnings("unchecked")
     public static Map<String, Map<String, Object>> dbQueryHelper(String sqlQuery, List<Object> sqlParams)
@@ -39,7 +42,7 @@ public class TaskScheduler
             
             if (resultSet != null)
             {
-                resultString = DatabaseResultsProcessors.processResultsToJson(resultSet);
+                resultString = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
                 resultMap = objectMapper.readValue(resultString, Map.class);
             }
         }
@@ -78,7 +81,7 @@ public class TaskScheduler
             Integer diagnosisInterval = (Integer) serviceMap.get("svc_diagnosis_interval");
             Integer numberOfRetries = (Integer) serviceMap.get("num_of_retries");
             Integer retryInterval = (Integer) serviceMap.get("retry_interval_secs") * 1000;
-            Integer sslDiagnosisInterval = (Integer) serviceMap.get("retry_interval_secs");
+            Integer sslDiagnosisInterval = (Integer) serviceMap.get("cert_diagnosis_interval");
             
             String sqlQuery = """
                     SELECT scg.service_id, cgm.user_id, su.channel_id, su.email_address, su.first_name, su.surname
@@ -95,7 +98,7 @@ public class TaskScheduler
             {
                 try
                 {
-                    URI domainhealthCheckUri = new URI(String.format("http://localhost:9090/api/services/domain-health-check/%s", serviceId));
+                    URI domainhealthCheckUri = new URI(String.format("http://%s:%s%s/services/domain-health-check/%s", undertowHost, undertowPort, undertowBaseUrl, serviceId));
                     String healthCheckResponse = "";
                     Map<String, Object> healthCheckResponseMap = new HashMap<>();
                     String healthCheckStatus = "";
@@ -117,19 +120,15 @@ public class TaskScheduler
                         healthCheckResponse = HttpRequestHandler.fetchRequest(domainhealthCheckUri);
                         if (healthCheckResponse == null || healthCheckResponse.isEmpty())
                         {
-                            System.out.println("healthcheck response failed");
                             return;
                         }
                         healthCheckResponseMap = objectMapper.readValue(healthCheckResponse, Map.class);
-                        healthCheckStatus = (String) healthCheckResponseMap.get("svc_status");
+                        healthCheckStatus = (String) healthCheckResponseMap.get("svc_health_status");
                         if ("UP".equals(healthCheckStatus))
                         {
-                            System.out.println("svc is up");
                             break;
                         }
                     }
-
-                    System.out.println("");
 
                     if ("DOWN".equals(healthCheckStatus)) // SVC_DOWN notification
                     {
@@ -157,7 +156,6 @@ public class TaskScheduler
                             
                             Logger.notificationLogger(alertQueryParams);
                             Mailer.sendEmailNotification("service-error-notification.html", recipientEmail, recipientName, serviceUrl, notificationTrigger);
-
                         });
 
                     }
@@ -168,14 +166,14 @@ public class TaskScheduler
                     e.printStackTrace();
                 }
             };
-            scheduledExecutorService.scheduleAtFixedRate(domainHealthTask, 20, diagnosisInterval, TimeUnit.SECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(domainHealthTask, 20, diagnosisInterval, TimeUnit.SECONDS);
 
             @SuppressWarnings("unchecked")
             Runnable sslCertHealthTask = () -> 
             {
                 try
                 {
-                    URI domainhealthCheckUri = new URI(String.format("http://localhost:9090/api/services/ssl-cert-health-check/%s", serviceId));
+                    URI domainhealthCheckUri = new URI(String.format("http://%s:%s%s/services/ssl-cert-health-check/%s", undertowHost, undertowPort, undertowBaseUrl, serviceId));
                     String healthCheckResponse = HttpRequestHandler.fetchRequest(domainhealthCheckUri);
                     if (healthCheckResponse == null || healthCheckResponse.isEmpty())
                     {
@@ -219,7 +217,7 @@ public class TaskScheduler
                     e.printStackTrace();
                 }
             };
-            scheduledExecutorService.scheduleAtFixedRate(sslCertHealthTask, 20, sslDiagnosisInterval, TimeUnit.SECONDS);
+            scheduledExecutorService.scheduleWithFixedDelay(sslCertHealthTask, 20, sslDiagnosisInterval, TimeUnit.SECONDS);
 
         });
 

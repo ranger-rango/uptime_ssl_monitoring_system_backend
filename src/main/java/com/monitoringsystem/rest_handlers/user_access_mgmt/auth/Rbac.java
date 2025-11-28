@@ -21,7 +21,7 @@ public class Rbac implements HttpHandler
         if (userSession == null)
         {
             httpServerExchange.setStatusCode(401);
-            httpServerExchange.getResponseSender().send("{'error': 'Session Error'}");
+            httpServerExchange.getResponseSender().send("{\"err_status\": \"Session Error\"}");
             return;
         }
 
@@ -51,10 +51,8 @@ public class Rbac implements HttpHandler
         //         }
         //     }
         // );
-        System.out.println("userRole" + userRole[0]);
         for (String allowedRole : allowedRoles)
         {
-            System.out.println(allowedRole);
             if (userRole[0].equals(allowedRole.toUpperCase()))
             {
                 try
@@ -69,8 +67,8 @@ public class Rbac implements HttpHandler
             }
         }
 
-        httpServerExchange.setStatusCode(413);
-        httpServerExchange.getResponseSender().send("{'error': 'Forbidden'}");
+        httpServerExchange.setStatusCode(403);
+        httpServerExchange.getResponseSender().send("{\"err_status\": \"Forbidden\"}");
 
     }
 

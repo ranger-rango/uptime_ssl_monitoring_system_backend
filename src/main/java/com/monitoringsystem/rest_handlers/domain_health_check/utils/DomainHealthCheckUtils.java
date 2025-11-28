@@ -90,6 +90,7 @@ public class DomainHealthCheckUtils
             connection.connect();
             
             int responseCode = connection.getResponseCode();
+            System.out.println("dhcutil: " + responseCode);
             long endTime = System.currentTimeMillis();
             testTime = LocalDateTime.now();
             long responseTime = endTime - startTime;

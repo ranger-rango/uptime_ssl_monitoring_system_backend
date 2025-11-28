@@ -22,16 +22,11 @@ public class ValidateRegToken
                     """;
             List<Object> sqlParams = List.of(registrationToken, emailAddress);
             ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
-            if (resultSet != null)
+            if (resultSet != null && resultSet.next())
             {
                 if (resultSet.getString("registration_token").equals(registrationToken))
                 {
                     isTokenValid = true;
-                    String deleteQuery = """
-                            DELETE FROM user_registration_tokens
-                            WHERE registration_token = ?
-                            """;
-                    DatabaseOperationsHikari.dbQuery(connection, deleteQuery, List.of(registrationToken));
                 }
             }
 

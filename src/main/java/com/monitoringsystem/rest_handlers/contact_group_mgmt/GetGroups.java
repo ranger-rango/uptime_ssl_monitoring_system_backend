@@ -19,6 +19,7 @@ public class GetGroups implements HttpHandler
     @Override
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception
     {
+        System.out.println("contact_goups");
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
         SELECT contact_group_id, group_name, description
@@ -29,11 +30,11 @@ public class GetGroups implements HttpHandler
         String response = "";
         if (resultSet != null)
         {
-            response = DatabaseResultsProcessors.processResultsToJson(resultSet);
+            response = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
         }
         else
         {
-            response = "{'status' : 'error'}";
+            response = "{\"err_status\" : \"Failed to fetch contact groups\"}";
         }
 
         httpServerExchange.setStatusCode(200);

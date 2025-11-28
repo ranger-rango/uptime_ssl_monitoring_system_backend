@@ -11,38 +11,21 @@ import com.monitoringsystem.utils.EndpointProps;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/service", templatePath = "", httpMethod = "DELETE")
-public class DeregisterService implements HttpHandler
+@EndpointProps(prefixPath = "/services", templatePath = "/health-check-logs", httpMethod = "GET")
+public class GetSvcHealthCheckLogs implements HttpHandler
 {
     @Override
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception
     {
-        FormParserFactory formFactory = FormParserFactory.builder().build();
-        FormDataParser formDataParser = formFactory.createParser(httpServerExchange);
-
-        if (formDataParser == null)
-        {
-            httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("Error !!!");
-            return;
-        }
-        FormData formData = formDataParser.parseBlocking();
-        String serviceId = formData.getFirst("service_id").getValue();
-        String status = "TERMINAL";
-
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
-            UPDATE service_info
-            SET svc_registration_status = ?
-            WHERE service_id = ?
+            SELECT shcl.shc_log_id, shcl.service_id, ss.svc_health_status, shcl.response_time_ms, shcl.http_response_code, shcl.check_at, shcl.error_message
+            FROM service_health_check_logs shcl
+            JOIN service_status ss ON shcl.svc_status_id = ss.svc_status_id
             """;
-        
-        List<Object> sqlParams = List.of(serviceId, status);
+        List<Object> sqlParams = List.of();
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)
@@ -51,7 +34,7 @@ public class DeregisterService implements HttpHandler
         }
         else
         {
-            response = "{'status': 'success'}";
+            response = "{\"err_status\" : \"Services health check logs fetch failed\"}";
         }
 
         httpServerExchange.setStatusCode(200);

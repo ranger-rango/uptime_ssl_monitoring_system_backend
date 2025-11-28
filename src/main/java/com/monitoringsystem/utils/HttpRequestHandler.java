@@ -17,14 +17,13 @@ public class HttpRequestHandler
             URL url = uri.toURL();
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("X-Auth-Key", Constants.TEST_ADMIN_AUTH_TOKEN);
+            connection.setRequestProperty("X-Auth-Key", Constants.DEFAULT_ADMIN_AUTH_TOKEN);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.connect();
 
             int responseCode = connection.getResponseCode();
-            System.out.println(responseCode);
-
+            
             if (responseCode >= 200 && responseCode < 300)
             {
                 try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));)

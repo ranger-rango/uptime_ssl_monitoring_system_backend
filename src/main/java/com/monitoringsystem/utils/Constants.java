@@ -35,7 +35,7 @@ record XmlConfig (XPath xpath, Document document) {}
 
 public class Constants
 {
-    public static final String TEST_ADMIN_AUTH_TOKEN = "local:tRvZh0ew0Qwa5x0_-f_PyctmNpkxdJ7PglqvA0HEvys"; // TODO remove test token
+    public static final String DEFAULT_ADMIN_AUTH_TOKEN = getDefaultAdminAuthToken();
     public static final String UDERTOW_PORT = getUndertowPort();
     public static final String UNDERTOW_HOST = getUndertowHost();
     public static final String UNDERTOW_BASE_PATH_REST = getUndertowBasePathRest();
@@ -49,6 +49,8 @@ public class Constants
     public static final String SMTP_SERVER_PORT = getSmtpServerPort();
     public static final String SMTP_SERVER_USERNAME = getSmtpServerUsername();
     public static final String SMTP_SERVER_PASSWORD = getSmtpServerPassword();
+    public static final String FRONTEND_DOMAIN = getFrontEndDomain();
+    public static final String FRONTEND_REG_USER_ENDPOINT = getFrontEndRegistrationEndpoint();
 
     static
     {
@@ -202,13 +204,13 @@ public class Constants
     {
         Map<String, Map<String, Object>> map = new HashMap<>();
         String sqlQuery = """
-                SELECT si.service_id, si.service_url_domain, sdm.diagnosis_method, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, scc.cert_diagnosis_interval, scc.alert_threshold_days
+                SELECT si.service_id, si.service_url_domain, sdm.diagnosis_method, sc.svc_diagnosis_interval, sc.num_of_retries, sc.retry_interval_secs, sci.cert_id, sci.issuer, sci.expiry_date, sci.is_cert_active_status, scc.cert_diagnosis_interval, scc.alert_threshold_days
                 FROM service_info si
                 JOIN service_configs sc ON si.service_id = sc.service_id 
 				JOIN service_diagnosis_methods sdm ON sc.svc_diag_id = sdm.svc_diag_id
 				JOIN ssl_certificate_info sci ON sci.service_id = si.service_id
 				JOIN ssl_certificate_configs scc ON sci.cert_id = scc.cert_id
-                WHERE si.svc_registration_status = 'ACTIVE'
+                WHERE si.svc_registration_status = 'ACTIVE' AND sci.is_cert_active_status = 'ACTIVE'
                 """;
         List<Object> sqlParams = List.of();
         Connection connection = null;
@@ -218,7 +220,7 @@ public class Constants
             ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
             if (resultSet != null)
             {
-                String jsonString = DatabaseResultsProcessors.processResultsToJson(resultSet);
+                String jsonString = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
                 ObjectMapper objectMapper = new ObjectMapper();
                 map = objectMapper.readValue(jsonString, Map.class);
             }
@@ -230,20 +232,6 @@ public class Constants
         catch (JsonProcessingException e)
         {
             e.printStackTrace();
-        }
-        finally 
-        {
-            if (connection != null)
-            {
-                try
-                {
-                    connection.close();
-                }
-                catch (SQLException e)
-                {
-                    e.printStackTrace();
-                }
-            }
         }
         return map;
     }
@@ -329,6 +317,77 @@ public class Constants
             e.printStackTrace();
             return "";
         }
+    }
+
+    public static String getFrontEndDomain()
+    {
+        try
+        {
+            XmlConfig xmlConfig = readXmlConfigFile();
+            XPathExpression expr = xmlConfig.xpath().compile("//FRONTEND/DOMAIN");
+            NodeList nodeList = (NodeList) expr.evaluate(xmlConfig.document(), XPathConstants.NODESET);
+            return nodeList.item(0).getTextContent();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String getFrontEndRegistrationEndpoint()
+    {
+        try
+        {
+            XmlConfig xmlConfig = readXmlConfigFile();
+            XPathExpression expr = xmlConfig.xpath().compile("//FRONTEND/REGISTER_USER_ENDPOINT");
+            NodeList nodeList = (NodeList) expr.evaluate(xmlConfig.document(), XPathConstants.NODESET);
+            return nodeList.item(0).getTextContent();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    public static String getDefaultAdminAuthToken()
+    {
+        String defaultAdmin = "";
+        try
+        {
+            XmlConfig xmlConfig = readXmlConfigFile();
+            XPathExpression expr = xmlConfig.xpath().compile("//DEFAULT/ADMIN_EMAIL");
+            NodeList nodeList = (NodeList) expr.evaluate(xmlConfig.document(), XPathConstants.NODESET);
+            defaultAdmin = nodeList.item(0).getTextContent();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+        String sqlQuery = """
+                SELECT auth_token
+                FROM user_auth_tokens
+                WHERE email_address = ?
+                """;
+        List<Object> sqlParams = List.of(defaultAdmin);
+        String defaultAdminAuthToken = "";
+        Connection connection = null;
+        try
+        {
+            connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
+            ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
+            if (resultSet != null && resultSet.next())
+            {
+                defaultAdminAuthToken = resultSet.getString("auth_token");
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return defaultAdminAuthToken;
     }
 
 
