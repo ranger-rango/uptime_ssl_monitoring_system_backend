@@ -62,7 +62,7 @@ public class Constants
 
     public static XmlConfig readXmlConfigFile() throws IOException, ParserConfigurationException, SAXException
     {
-        Path configPath = Paths.get("sys.conf/conf.xml");
+        Path configPath = Paths.get("conf.xml");
         String xmlString = new String(Files.readAllBytes(configPath));
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();

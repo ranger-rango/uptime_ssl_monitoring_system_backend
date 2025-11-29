@@ -41,7 +41,7 @@ public class DatabaseWriteConfig
                 # windows psql conf file: C:\\Program Files\\PostgreSQL\\17\\data
                 """, dbUserName, dbPassword, databaseName, databaseHost, databasePort);
         
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("sys.conf/db.properties")))
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter("db.properties")))
         {
             bufferedWriter.write(dbProperties);
         }

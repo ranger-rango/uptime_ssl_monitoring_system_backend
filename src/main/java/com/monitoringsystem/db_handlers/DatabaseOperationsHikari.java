@@ -33,15 +33,13 @@ public class DatabaseOperationsHikari
             }
             else
             {
-                int rowsAffected = pstmt.getUpdateCount();
-                System.out.println(rowsAffected + "row(s) affected.");
+                pstmt.getUpdateCount();
             }
             connection.commit();
         }
         catch (SQLException e)
         {
             connection.rollback();
-            System.out.println("ops\n");
             e.printStackTrace();
         }
 

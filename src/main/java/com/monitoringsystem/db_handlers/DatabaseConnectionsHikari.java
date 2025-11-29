@@ -14,7 +14,7 @@ public class DatabaseConnectionsHikari
     static
     {
         Properties properties = new Properties();
-        try (FileInputStream input = new FileInputStream("sys.conf/db.properties"))
+        try (FileInputStream input = new FileInputStream("db.properties"))
         {
             properties.load(input);
         }
