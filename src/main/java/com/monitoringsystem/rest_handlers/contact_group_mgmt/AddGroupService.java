@@ -37,12 +37,12 @@ public class AddGroupService implements HttpHandler
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
             INSERT INTO service_contact_groups (service_id, contact_group_id) 
-            VALUES (
-            ?, 
-            (SELECT service_id FROM service_info WHERE service_name = ?))
+            VALUES ( 
+            (SELECT service_id FROM service_info WHERE service_name = ?), 
+            ?)
             """;
         
-        List<Object> sqlParams = List.of(contactGroupId, serviceName);
+        List<Object> sqlParams = List.of(serviceName, contactGroupId);
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)
