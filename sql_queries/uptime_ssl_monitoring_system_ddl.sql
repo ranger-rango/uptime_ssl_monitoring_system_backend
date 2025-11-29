@@ -1,13 +1,9 @@
--- =========================================================================
--- Helper Function and Trigger for date_modified (Best Practice)
--- Using TIMESTAMPTZ (Timestamp with Time Zone) for professional logging
--- =========================================================================
 
--- Function to automatically update the date_modified column
+CREATE DATABASE uptime_ssl_monitoring_system_db;
+
 CREATE OR REPLACE FUNCTION update_date_modified()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Only update if the row content is actually changed (excluding this column)
     IF ROW (NEW.*) IS DISTINCT FROM ROW (OLD.*) THEN
         NEW.date_modified = NOW();
     END IF;
@@ -15,11 +11,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- =========================================================================
--- Core Entity Tables (Lookup & High-Level Data)
--- NOTE: service_id, user_id, contact_group_id, and cert_id are VARCHAR primary keys.
--- All foreign keys referencing them must also be VARCHAR.
--- =========================================================================
 
 CREATE TABLE roles (
     role_id BIGSERIAL PRIMARY KEY,
