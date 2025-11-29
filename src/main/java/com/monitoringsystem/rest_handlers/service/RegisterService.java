@@ -21,7 +21,7 @@ import io.undertow.server.handlers.form.FormDataParser;
 import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/service", templatePath = "", httpMethod = "POST")
+@EndpointProps(prefixPath = "/service", templatePath = "", httpMethod = "POST", allowedRoles = {"ADMIN", "OPERATOR"})
 public class RegisterService implements HttpHandler
 {
     public static boolean dbOp(String sqlQuery, List<Object> sqlParams)
