@@ -35,7 +35,7 @@ record XmlConfig (XPath xpath, Document document) {}
 
 public class Constants
 {
-    public static final String DEFAULT_ADMIN_AUTH_TOKEN = getDefaultAdminAuthToken();
+    public static String DEFAULT_ADMIN_AUTH_TOKEN; // = getDefaultAdminAuthToken();
     public static final String UDERTOW_PORT = getUndertowPort();
     public static final String UNDERTOW_HOST = getUndertowHost();
     public static final String UNDERTOW_BASE_PATH_REST = getUndertowBasePathRest();
@@ -44,7 +44,7 @@ public class Constants
     public static final String DATABASE_NAME = getDatabaseName();
     public static final String DB_USERNAME = getDbUserName();
     public static final String DB_PASSWORD = getDbPassword();
-    public static volatile Map<String, Map<String, Object>> SERVICE_CONFIGURATION;// = getServiceConfigs();
+    public static volatile Map<String, Map<String, Object>> SERVICE_CONFIGURATION;
     public static final String SMTP_SERVER = getSmtpServer();
     public static final String SMTP_SERVER_PORT = getSmtpServerPort();
     public static final String SMTP_SERVER_USERNAME = getSmtpServerUsername();
@@ -52,10 +52,12 @@ public class Constants
     public static final String FRONTEND_DOMAIN = getFrontEndDomain();
     public static final String FRONTEND_REG_USER_ENDPOINT = getFrontEndRegistrationEndpoint();
 
-    static
+    public static void init()
     {
         load();
         startRefreshThread();
+        DEFAULT_ADMIN_AUTH_TOKEN = getDefaultAdminAuthToken();
+
     }
 
     public static XmlConfig readXmlConfigFile() throws IOException, ParserConfigurationException, SAXException

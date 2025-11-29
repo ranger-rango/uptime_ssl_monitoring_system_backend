@@ -32,17 +32,17 @@ public class AddGroupService implements HttpHandler
         }
 
         FormData formData = formDataParser.parseBlocking();
-        String contactGroupName = formData.getFirst("contact_group").getValue();
+        String contactGroupId = formData.getFirst("contact_group_id").getValue();
         String serviceName = formData.getFirst("service_name").getValue();
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
             INSERT INTO service_contact_groups (service_id, contact_group_id) 
             VALUES (
-            (SELECT contact_group_id FROM contact_groups WHERE group_name = ?), 
+            ?, 
             (SELECT service_id FROM service_info WHERE service_name = ?))
             """;
         
-        List<Object> sqlParams = List.of(contactGroupName, serviceName);
+        List<Object> sqlParams = List.of(contactGroupId, serviceName);
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)

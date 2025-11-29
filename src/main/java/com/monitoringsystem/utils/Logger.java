@@ -73,7 +73,7 @@ public class Logger
     public static void notificationLogger(List<Object> sqlParams)
     {
         String sqlQuery = """
-                INSERT INTO notification_history_logs (notification_trigger_id, user_id, channel_id, create_at) 
+                INSERT INTO notification_history_logs (notification_trigger_id, user_id, channel_id, created_at) 
                 VALUES (?, ?, ?, ?)
                 """;
         loggerHelper(sqlQuery, sqlParams);

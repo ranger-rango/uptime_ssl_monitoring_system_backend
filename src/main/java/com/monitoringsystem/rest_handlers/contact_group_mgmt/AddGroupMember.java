@@ -32,18 +32,18 @@ public class AddGroupMember implements HttpHandler
         }
 
         FormData formData = formDataParser.parseBlocking();
-        String contactGroupName = formData.getFirst("contact_group").getValue();
+        String contactGroupId = formData.getFirst("contact_group_id").getValue();
         String emailAddress = formData.getFirst("email_address").getValue();
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
             INSERT INTO contact_group_members (contact_group_id, user_id) 
             VALUES (
-            (SELECT contact_group_id FROM contact_groups WHERE group_name = ?), 
+            ?, 
             (SELECT user_id FROM system_users WHERE email_address = ?)
             )
             """;
         
-        List<Object> sqlParams = List.of(contactGroupName, emailAddress);
+        List<Object> sqlParams = List.of(contactGroupId, emailAddress);
         ResultSet resultSet = DatabaseOperationsHikari.dbQuery(connection, sqlQuery, sqlParams);
         String response = "";
         if (resultSet != null)

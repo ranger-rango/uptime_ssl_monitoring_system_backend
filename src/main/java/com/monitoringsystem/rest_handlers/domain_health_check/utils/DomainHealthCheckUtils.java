@@ -90,7 +90,6 @@ public class DomainHealthCheckUtils
             connection.connect();
             
             int responseCode = connection.getResponseCode();
-            System.out.println("dhcutil: " + responseCode);
             long endTime = System.currentTimeMillis();
             testTime = LocalDateTime.now();
             long responseTime = endTime - startTime;
@@ -110,7 +109,6 @@ public class DomainHealthCheckUtils
         catch (IOException e)
         {
             testTime = LocalDateTime.now();
-            System.err.println("GET Request failed for " + urlString + ": " + e.getMessage());
             serviceStatusMap.put("response_code", 0);
             serviceStatusMap.put("response_time_ms", 0);
             serviceStatusMap.put("error_message", "");
@@ -171,7 +169,6 @@ public class DomainHealthCheckUtils
         }
         catch (Exception e)
         {
-            System.err.println("TLS Handshake failed for " + urlString + ": " + e.getMessage());
         }
         finally
         {
@@ -225,7 +222,6 @@ public class DomainHealthCheckUtils
         catch (IOException e)
         {
             testTime = LocalDateTime.now();
-            System.err.println("GET Request failed for " + urlString + ": " + e.getMessage());
             serviceStatusMap.put("response_code", 0);
             serviceStatusMap.put("response_time_ms", 0);
             serviceStatusMap.put("error_message", "");
@@ -276,7 +272,6 @@ public class DomainHealthCheckUtils
         catch (IOException e)
         {
             testTime = LocalDateTime.now();
-            System.err.println("GET Request failed for " + urlString + ": " + e.getMessage());
             serviceStatusMap.put("response_code", 0);
             serviceStatusMap.put("response_time_ms", 0);
             serviceStatusMap.put("error_message", "");

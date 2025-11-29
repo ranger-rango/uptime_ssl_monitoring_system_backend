@@ -13,7 +13,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/services", templatePath = "/health-check-logs", httpMethod = "GET")
+@EndpointProps(prefixPath = "/services", templatePath = "/health-check-logs", httpMethod = "GET", allowedRoles = {"ADMIN", "OPERATOR", "VIEWER"})
 public class GetSvcHealthCheckLogs implements HttpHandler
 {
     @Override

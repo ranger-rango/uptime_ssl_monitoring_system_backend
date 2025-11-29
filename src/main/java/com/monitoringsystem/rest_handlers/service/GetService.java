@@ -13,7 +13,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/service", templatePath = "/{serviceId}", httpMethod = "GET")
+@EndpointProps(prefixPath = "/service", templatePath = "/{serviceId}", httpMethod = "GET", allowedRoles = {"ADMIN", "OPERATOR"})
 public class GetService implements HttpHandler
 {
     @Override

@@ -17,7 +17,7 @@ public class AuthManager
     @SuppressWarnings("unchecked")
     public static String fetchAuthToken(String emailAddress)
     {
-        String storeToken = null;
+        String storedToken = null;
         ObjectMapper objectMapper = new ObjectMapper();
         try (Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection())
         {
@@ -32,14 +32,15 @@ public class AuthManager
             {
                 String jsonString = DatabaseResultsProcessors.processResultsToJson(resultSet, connection);
                 Map<String, Map<String, Object>> resultMap = objectMapper.readValue(jsonString, Map.class);
-                storeToken = String.valueOf(resultMap.get("1").get("auth_token"));
+                Map<String, Object> innerMap = resultMap.get("1");
+                storedToken = innerMap != null ? String.valueOf(resultMap.get("1").get("auth_token")) : null;
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
-        return storeToken;
+        return storedToken;
 
     }
 

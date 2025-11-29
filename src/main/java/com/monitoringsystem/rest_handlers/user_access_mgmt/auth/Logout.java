@@ -37,7 +37,7 @@ public class Logout implements HttpHandler
                     {
                         return;
                     }
-                    AuthManager.destroyToken(emailAddress, "REG_TOKEN");
+                    AuthManager.destroyToken(emailAddress, "AUTH_TOKEN");
 
                     httpServerExchange.setStatusCode(200);
                     httpServerExchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");

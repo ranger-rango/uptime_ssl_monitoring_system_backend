@@ -42,7 +42,7 @@ public class LoginUser implements HttpHandler
         FormData formData = formDataParser.parseBlocking();
         String emailAddress = formData.getFirst("email_address").getValue();
         String password = formData.getFirst("password").getValue();
-        Boolean rememberMe = formData.getFirst("remember_me").getValue() != null; 
+        Boolean rememberMe = formData.getFirst("remember_me") != null; 
 
         if (!"".equals(emailAddress) && !"".equals(password))
         {        

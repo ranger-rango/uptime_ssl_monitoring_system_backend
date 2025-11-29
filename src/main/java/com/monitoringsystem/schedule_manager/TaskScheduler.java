@@ -84,10 +84,11 @@ public class TaskScheduler
             Integer sslDiagnosisInterval = (Integer) serviceMap.get("cert_diagnosis_interval");
             
             String sqlQuery = """
-                    SELECT scg.service_id, cgm.user_id, su.channel_id, su.email_address, su.first_name, su.surname
+                    SELECT scg.service_id, cgm.user_id, su.channel_id, su.email_address, su.first_name, su.surname, si.service_url_domain
                     FROM service_contact_groups scg
                     JOIN contact_group_members cgm ON cgm.contact_group_id = scg.contact_group_id
                     JOIN system_users su ON su.user_id = cgm.user_id
+					JOIN service_info si ON si.service_id = scg.service_id
                     WHERE scg.service_id = ?
                     """;
             List<Object> sqlParams = List.of(serviceId);
@@ -129,7 +130,6 @@ public class TaskScheduler
                             break;
                         }
                     }
-
                     if ("DOWN".equals(healthCheckStatus)) // SVC_DOWN notification
                     {
                         String notificationTriggerQuery = """
@@ -141,7 +141,6 @@ public class TaskScheduler
                         var notTriggerResults = dbQueryHelper(notificationTriggerQuery, notificationTriggerParams);
                         Integer notificationTriggerId = (Integer) notTriggerResults.get("1").get("notification_trigger_id");
 
-
                         contactGroupData.entrySet().stream().forEach(dataEntry -> 
                         {
                             Map<String, Object> contactGroupMember = dataEntry.getValue();
@@ -150,7 +149,7 @@ public class TaskScheduler
                             String serviceUrl = (String) contactGroupMember.get("service_url_domain");
                             String notificationTrigger = "SVC_DOWN";
                             String userId = (String) contactGroupMember.get("user_id");
-                            String channelId = (String) contactGroupMember.get("channel_id");
+                            Integer channelId = (Integer) contactGroupMember.get("channel_id");
                             LocalDateTime createAt = LocalDateTime.now();
                             List<Object> alertQueryParams = List.of(notificationTriggerId, userId, channelId, createAt);
                             
@@ -201,7 +200,7 @@ public class TaskScheduler
                             String serviceUrl = (String) contactGroupMember.get("service_url_domain");
                             String notificationTrigger = "SSL_CERT_EXPIRY";
                             String userId = (String) contactGroupMember.get("user_id");
-                            String channelId = (String) contactGroupMember.get("channel_id");
+                            Integer channelId = (Integer) contactGroupMember.get("channel_id");
                             LocalDateTime createAt = LocalDateTime.now();
                             List<Object> alertQueryParams = List.of(notificationTriggerId, userId, channelId, createAt);
                             

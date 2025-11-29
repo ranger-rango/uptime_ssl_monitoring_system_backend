@@ -13,13 +13,12 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/contact-groups", templatePath = "", httpMethod = "GET")
+@EndpointProps(prefixPath = "/contact-groups", templatePath = "", httpMethod = "GET", allowedRoles = {"ADMIN", "OPERATOR"})
 public class GetGroups implements HttpHandler
 {
     @Override
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception
     {
-        System.out.println("contact_goups");
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
         SELECT contact_group_id, group_name, description

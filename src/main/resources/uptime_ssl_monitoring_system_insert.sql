@@ -15,7 +15,7 @@ INSERT INTO notification_channels (channel_title) VALUES ('EMAIL'), ('TELEGRAM')
 INSERT INTO service_diagnosis_methods (diagnosis_method) VALUES ('PING'), ('REQUEST'), ('PORT_SCAN'), ('HEAD'), ('OPTIONS'),('TLS_HANDSHAKE');
 INSERT INTO certificate_status (cert_health_status) VALUES ('VALID'), ('WATCH'), ('EXPIRED'), ('TERMINAL');
 INSERT INTO service_status (svc_health_status) VALUES ('UP'), ('DOWN');
-INSERT INTO notification_triggers (notification_trigger) VALUES ('SVC_DOWN'), ('SSL_CERT_EXPIRY'), ('CONFIG_CHANGE');
+INSERT INTO notification_triggers (notification_trigger) VALUES ('SVC_DOWN'), ('SSL_CERT_EXPIRY'), ('CONFIG_CHANGE'), ('REG_NOTIFICATION');
 
 
 -- =========================================================================

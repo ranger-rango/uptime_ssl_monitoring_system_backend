@@ -11,33 +11,23 @@ import com.monitoringsystem.utils.EndpointProps;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
-import io.undertow.server.handlers.form.FormData;
-import io.undertow.server.handlers.form.FormDataParser;
-import io.undertow.server.handlers.form.FormParserFactory;
 import io.undertow.util.Headers;
 
-@EndpointProps(prefixPath = "/contact-group", templatePath = "/members", httpMethod = "POST")
+@EndpointProps(prefixPath = "/contact-group", templatePath = "/members/{groupId}", httpMethod = "GET", allowedRoles = {"ADMIN", "OPERATOR"})
 public class GetGroupMembers implements HttpHandler
 {
     @Override
     public void handleRequest(HttpServerExchange httpServerExchange) throws Exception
     {
-        FormParserFactory formParserFactory = FormParserFactory.builder().build();
-        FormDataParser formDataParser = formParserFactory.createParser(httpServerExchange);
-        if (formDataParser == null)
-        {
-            httpServerExchange.setStatusCode(400);
-            httpServerExchange.getResponseSender().send("{'status': 'error'}");
-            return;
-        }
-        FormData formData = formDataParser.parseBlocking();
-        String contactGroupId = formData.getFirst("contact_group_id").getValue();
+        String contactGroupId = httpServerExchange.getQueryParameters().get("groupId").getFirst();
 
         Connection connection = DatabaseConnectionsHikari.getDbDataSource().getConnection();
         String sqlQuery = """
-            SELECT cgm.user_id, su.user_id, su.role_id, su.channel_id, su.email_address, su.first_name, su.surname
+            SELECT cgm.user_id, rl.role_title, nc.channel_title, su.email_address, su.tel, su.telegram, su.first_name, su.surname
             FROM contact_group_members cgm
             JOIN system_users su ON su.user_id = cgm.user_id
+            JOIN roles rl ON rl.role_id = su.role_id
+            JOIN notification_channels nc ON nc.channel_id = su.channel_id
             WHERE contact_group_id = ?
             """;
         List<Object> sqlParams = List.of(contactGroupId);
@@ -49,7 +39,7 @@ public class GetGroupMembers implements HttpHandler
         }
         else
         {
-            response = "{'status' : 'error'}";
+            response = "{\"status\" : \"Fetch group members failed\"}";
         }
 
         httpServerExchange.setStatusCode(200);

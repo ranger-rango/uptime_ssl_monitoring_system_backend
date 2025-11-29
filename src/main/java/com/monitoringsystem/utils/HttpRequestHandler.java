@@ -22,9 +22,10 @@ public class HttpRequestHandler
             connection.setReadTimeout(5000);
             connection.connect();
 
-            int responseCode = connection.getResponseCode();
+            Integer responseCode = connection.getResponseCode();
             
-            if (responseCode >= 200 && responseCode < 300)
+            // if (responseCode >= 200 && responseCode < 300)
+            if (responseCode != null)
             {
                 try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));)
                 {
@@ -36,11 +37,6 @@ public class HttpRequestHandler
                     }
                 }
             }
-            else
-            {
-                return null;
-            }
-            
 
         }
         catch(Exception e)
