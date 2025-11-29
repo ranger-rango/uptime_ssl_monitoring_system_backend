@@ -1,6 +1,8 @@
 
 CREATE DATABASE uptime_ssl_monitoring_system_db;
 
+\connect uptime_ssl_monitoring_system_db
+
 CREATE OR REPLACE FUNCTION update_date_modified()
 RETURNS TRIGGER AS $$
 BEGIN

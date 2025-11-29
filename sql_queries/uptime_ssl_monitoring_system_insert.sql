@@ -11,4 +11,4 @@ VALUES ('Cj7KUtfyhWvrwi1cEfuU2DizWZ-dJ9-ATFaAJT2Yniw', 1, 1, 'default.system@ssl
 '804f50ddbaab7f28c933a95c162d019acbf96afde56dba10e4c7dfcfe453dec4bacf5e78b1ddbdc1695a793bcb5d7d409425db4cc3370e71c4965e4ef992e8c4', 'ACTIVE');
 
 INSERT INTO user_auth_tokens (email_address, auth_token)
-VALUES ('default.system@ssldom.com', 'local:qfpLcihCrB_C1zFtTjygWbt-QK0rDqYyX8V98PAHMPo')
+VALUES ('default.system@ssldom.com', 'local:qfpLcihCrB_C1zFtTjygWbt-QK0rDqYyX8V98PAHMPo');
