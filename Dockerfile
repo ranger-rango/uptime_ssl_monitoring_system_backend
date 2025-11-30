@@ -12,7 +12,7 @@ RUN mvn -q -DskipTests package
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
-COPY --from=build /workspace/target/*-shaded.jar app.jar
+COPY --from=build /workspace/target/app.jar app.jar
 
 # Expose the port
 EXPOSE 9090
