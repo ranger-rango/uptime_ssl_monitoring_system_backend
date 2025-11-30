@@ -21,5 +21,5 @@ EXPOSE 9090
 ENV JAVA_OPTS="--enable-preview"
 
 # Run the fat jar
-CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+CMD ["sh", "-c", "cp /etc/secrets/* /app/ && java $JAVA_OPTS -jar app.jar"]
  
