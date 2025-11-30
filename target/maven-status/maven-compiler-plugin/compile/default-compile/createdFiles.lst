@@ -48,11 +48,13 @@ com/monitoringsystem/utils/notification_manager/Mailer$2.class
 com/monitoringsystem/rest_handlers/contact_group_mgmt/GetGroupMembers.class
 com/monitoringsystem/rest_handlers/contact_group_mgmt/GetGroups.class
 com/monitoringsystem/db_handlers/DatabaseResultsProcessors.class
+com/monitoringsystem/rest_handlers/service/GetSvcHealthCheckLogs.class
 com/monitoringsystem/db_handlers/DatabaseWriteConfig.class
 com/monitoringsystem/rest_handlers/user_access_mgmt/DeactivateUser.class
 com/monitoringsystem/Main.class
 com/monitoringsystem/utils/TokenGenerator.class
 com/monitoringsystem/rest_handlers/contact_group_mgmt/AddGroupMember.class
+com/monitoringsystem/rest_handlers/service/GetCertHealthCheckLogs.class
 com/monitoringsystem/rest_handlers/service/GetService.class
 com/monitoringsystem/utils/XmlConfig.class
 com/monitoringsystem/utils/Constants.class
