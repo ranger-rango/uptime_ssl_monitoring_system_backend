@@ -22,8 +22,7 @@
     2. Copy the XML configurations below into the file.  
     3. Configure the items in the '{}' to your specifications.  
 
-<pre>
-    ```
+    ```xml
         <?xml version="1.0" encoding="UTF-8"?>
         <API>
             <UNDERTOW>
@@ -55,7 +54,6 @@
             </DEFAULT>
         </API>
     ```
-</pre>
 #### Create db.properties  
     - Create a db.properties file in the sys.conf/ directory.  
 
