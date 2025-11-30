@@ -24,7 +24,7 @@ import com.monitoringsystem.utils.notification_manager.Mailer;
 public class TaskScheduler
 {
     private static final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
-    private static String undertowHost = Constants.UNDERTOW_HOST;
+    private static String undertowHost = Constants.UNDERTOW_HOST.equals("0.0.0.0") ? "localhost" : Constants.UNDERTOW_HOST;
     private static String undertowPort = Constants.UDERTOW_PORT;
     private static String undertowBaseUrl = Constants.UNDERTOW_BASE_PATH_REST;
 
