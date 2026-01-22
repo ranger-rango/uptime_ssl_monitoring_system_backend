@@ -31,12 +31,12 @@ com/monitoringsystem/rest_handlers/service/UpdateService.class
 com/monitoringsystem/rest_handlers/service/DeregisterService.class
 com/monitoringsystem/utils/hashing/Hasher.class
 com/monitoringsystem/rest_handlers/ssl_health_check/RunSSLCertHealthCheck.class
-com/monitoringsystem/rest/Routes.class
 com/monitoringsystem/rest/utils/CORSHandler.class
+com/monitoringsystem/rest/Routes.class
 com/monitoringsystem/utils/symm_enc/AESEnc.class
 com/monitoringsystem/rest/RestApiServer.class
-com/monitoringsystem/db_handlers/DatabaseOperationsHikari.class
 com/monitoringsystem/utils/EndpointProps.class
+com/monitoringsystem/db_handlers/DatabaseOperationsHikari.class
 com/monitoringsystem/utils/symm_enc/AESDec.class
 com/monitoringsystem/rest_handlers/user_access_mgmt/auth/LoginUser.class
 com/monitoringsystem/rest_handlers/user_access_mgmt/auth/Attachments.class
